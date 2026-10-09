@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/Zoro/projects/limit-order-book/build-release/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

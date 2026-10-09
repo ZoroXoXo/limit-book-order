@@ -1,0 +1,3 @@
+/home/Zoro/projects/limit-order-book/build-release/CMakeFiles/bench_lob.dir
+/home/Zoro/projects/limit-order-book/build-release/CMakeFiles/edit_cache.dir
+/home/Zoro/projects/limit-order-book/build-release/CMakeFiles/rebuild_cache.dir
