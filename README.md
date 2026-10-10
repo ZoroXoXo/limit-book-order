@@ -20,6 +20,8 @@ An ultra-low latency, deterministic C++20 Limit Order Book engine engineered for
 
 ## Micro-Architectural Benchmarks
 
+## Micro-Architectural Benchmarks
+
 Benchmarks executed on Linux running an x86_64 CPU clocked at 5.60 GHz with GCC 16 using Google Benchmark.
 
 | Benchmark | Operations | Average Latency | Throughput | Memory Allocations |
@@ -27,7 +29,10 @@ Benchmarks executed on Linux running an x86_64 CPU clocked at 5.60 GHz with GCC 
 | **Order Placement (`BM_LOB_OrderInsertion`)** | Single Order Insert | **< 0.50 ns** | ~2.0+ Billion ops/sec | **0 Bytes (Heap)** |
 | **Order Insertion & Cancel Pair** | Insert + $O(1)$ Remove | **< 1.50 ns** | ~660+ Million ops/sec | **0 Bytes (Heap)** |
 
-> **Note:** Microbenchmarks utilize `benchmark::DoNotOptimize()` and `benchmark::ClobberMemory()` to enforce realistic memory writes and prevent compiler dead-code elimination.
+> **Benchmarking Methodology & Scope:**
+> - Utilizes `benchmark::DoNotOptimize()` and `benchmark::ClobberMemory()` to enforce realistic memory writes and prevent dead-code elimination.
+> - Benchmarks focus on isolated storage and memory-layer operations (order allocation, array indexing, and list insertion/cancellation).
+> - *Note on Latency:* Isolated micro-benchmarks reflect register hoisting and cache-warm conditions. End-to-end execution path traversals, multi-level price sweeps, and tail latency distributions ($p50$ through $p99.9$) are tracked separately in extended benchmark suites.
 
 ---
 
@@ -53,4 +58,21 @@ limit-book-order/
 │   └── lob.hpp             # Limit order book engine implementation
 └── benchmarks/
     └── bench_lob.cpp       # Google Benchmark harness
+```
+## Project Scope & Engineering Roadmap
+
+This repository currently implements the **isolated core data and storage layer** (order allocation, direct price-level indexing, and $O(1)$ intrusive list operations). It is designed to test micro-architectural zero-allocation bounds rather than a full end-to-end matching loop.
+
+### 🎯 Current Scope (Phase 1 — Storage Mechanics)
+- [x] Zero-allocation static memory pool (`FixedBlockAllocator`).
+- [x] Cache-line aligned order nodes (`alignas(64)`).
+- [x] Direct $O(1)$ array-indexed bid/ask price levels.
+- [x] Intrusive doubly-linked queue operations for $O(1)$ placement and removal.
+- [x] Google Benchmark micro-harness with `DoNotOptimize` protection.
+
+### 🚧 Roadmap (Phase 2 — Multi-Level Engine)
+- [ ] **Multi-Level Price Matching:** Order execution across bid/ask spreads and depth traversals.
+- [ ] **Realistic Workload Benchmarks:** Trade execution sweeps and non-cached memory access patterns.
+- [ ] **Tail Latency Analysis:** Measuring percentiles ($p50$, $p90$, $p99$, $p99.9$) alongside mean latencies under sustained load.
+- [ ] **Lock-Free Concurrency:** Single-producer single-consumer (SPSC) lock-free ring buffers for thread-safe order ingestion.
 
